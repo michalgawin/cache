@@ -3,7 +3,7 @@ package pl.garnizon.memdb;
 public class Main {
 
     public static void main(String[] args) {
-        TransactionalDatabase transactionalDatabase = DatabaseImpl.create();
+        TransactionalDatabase<String> transactionalDatabase = DatabaseImpl.create();
         transactionalDatabase.set("name", "michal");
         transactionalDatabase.get("name");
         transactionalDatabase.delete("name");

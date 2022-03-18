@@ -26,10 +26,10 @@ class DatabaseImplTest {
     Snapshot snapshot;
 
     @Mock
-    Supplier<Snapshot> snapshotSupplier;
+    Supplier<Snapshot<String>> snapshotSupplier;
 
     @Spy
-    Deque<Snapshot> snapshots = new LinkedList<>();
+    Deque<Snapshot<String>> snapshots = new LinkedList<>();
 
     @BeforeAll
     static public void beforeAll() {
@@ -44,11 +44,11 @@ class DatabaseImplTest {
 
     @Test
     public void databaseOperationsTest() {
-        final Database database = new DatabaseImpl(() -> snapshot, snapshots);
+        final Database<String> database = new DatabaseImpl<>(() -> snapshot, snapshots);
 
-        database.delete("Name");
-        database.set("Name", "Abc");
-        database.get("Name");
+        database.delete("Name")
+                .set("Name", "Abc")
+                .get("Name");
 
         verify(snapshot).set(anyString(), anyString());
         verify(snapshot).get(anyString());
@@ -67,11 +67,11 @@ class DatabaseImplTest {
 
     @Test
     public void rollbackTransactionTest() {
-        final Transaction database = new DatabaseImpl(snapshotSupplier, snapshots);
+        final Transaction database = new DatabaseImpl<>(snapshotSupplier, snapshots);
 
-        database.begin();
-        database.begin();
-        database.rollback();
+        database.begin()
+                .begin()
+                .rollback();
 
         verify(snapshotSupplier, times(3)).get();
         assertThat(snapshots.size()).isEqualTo(1);
@@ -84,9 +84,9 @@ class DatabaseImplTest {
 
         final Transaction database = new DatabaseImpl(snapshotSupplier, snapshots);
 
-        database.begin();
-        database.begin();
-        database.commit();
+        database.begin()
+                .begin()
+                .commit();
 
         verify(snapshotSupplier, times(3)).get();
         assertThat(snapshots.size()).isEqualTo(0);
@@ -94,14 +94,16 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterCommit() {
-        final DatabaseImpl database = DatabaseImpl.create();
+        final DatabaseImpl<String> database = DatabaseImpl.create();
 
         final String name = "name";
         final String name2 = "name2";
+        final String name3 = "name3";
         final String value = "value";
 
         assertThat(database.set(name, value)
                 .begin()
+                .set(name3, value)
                 .delete(name)
                 .delete(name)
                 .begin()
@@ -109,6 +111,7 @@ class DatabaseImplTest {
                 .set(name, value)
                 .begin()
                 .set(name2, value)
+                .delete(name3)
                 .count(value)
         ).isEqualTo(2);
 
@@ -119,7 +122,7 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterRollback() {
-        final DatabaseImpl database = DatabaseImpl.create();
+        final DatabaseImpl<String> database = DatabaseImpl.create();
 
         final String name = "name";
         final String name2 = "name2";

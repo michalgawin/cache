@@ -27,7 +27,7 @@ class SnapshotImplTest {
     Multimap<String, String> invertedIndex;
 
     @InjectMocks
-    SnapshotImpl snapshot;
+    SnapshotImpl<String> snapshot;
 
     @Test
     public void setTest() {
@@ -58,7 +58,7 @@ class SnapshotImplTest {
         when(memtable.get("b")).thenReturn("c");
         when(invertedIndex.get("c")).thenReturn(Set.of("a", "b"));
         when(invertedIndex.get("a")).thenReturn(Set.of());
-        when(invertedIndex.get(SnapshotImpl.TOMBSTONE)).thenReturn(Set.of());
+        when(invertedIndex.get(SnapshotImpl.getTombstone())).thenReturn(Set.of());
 
         assertThat(snapshot.count("c")).isEqualTo(2);
         assertThat(snapshot.count("a")).isEqualTo(0);

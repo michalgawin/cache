@@ -1,13 +1,13 @@
 package pl.garnizon.memdb;
 
-public interface Database {
+public interface Database<T> {
 
-    Database set(String key, String value);
+    Database<T> set(String key, T value);
 
-    String get(String key);
+    T get(String key);
 
-    Database delete(String key);
+    Database<T> delete(String key);
 
-    long count(String value);
+    long count(T value);
 
 }

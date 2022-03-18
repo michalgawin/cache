@@ -6,20 +6,20 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-public class DatabaseImpl implements TransactionalDatabase {
+public class DatabaseImpl<T> implements TransactionalDatabase<T> {
 
     public static final String NO_TRANSACTION = "NO TRANSACTION";
 
-    private final Supplier<Snapshot> snapshotSupplier;
-    private final Snapshot snapshot;
-    private final Deque<Snapshot> snapshots;
-    private Snapshot currentSnapshot;
+    private final Supplier<Snapshot<T>> snapshotSupplier;
+    private final Snapshot<T> snapshot;
+    private final Deque<Snapshot<T>> snapshots;
+    private Snapshot<T> currentSnapshot;
 
     public static DatabaseImpl create() {
         return new DatabaseImpl(SnapshotImpl::create, new LinkedList<>());
     }
 
-    DatabaseImpl(Supplier<Snapshot> snapshotSupplier, Deque<Snapshot> snapshots) {
+    DatabaseImpl(Supplier<Snapshot<T>> snapshotSupplier, Deque<Snapshot<T>> snapshots) {
         this.snapshotSupplier = snapshotSupplier;
         this.snapshots = snapshots;
 
@@ -28,7 +28,7 @@ public class DatabaseImpl implements TransactionalDatabase {
     }
 
     @Override
-    public DatabaseImpl begin() {
+    public DatabaseImpl<T> begin() {
         Snapshot t = createSnapshot();
         this.snapshots.add(t);
         this.currentSnapshot = t;
@@ -37,7 +37,7 @@ public class DatabaseImpl implements TransactionalDatabase {
     }
 
     @Override
-    public DatabaseImpl rollback() {
+    public DatabaseImpl<T> rollback() {
         if (isOpen()) {
             this.snapshots.pollLast();
             this.currentSnapshot = this.snapshots.peekLast();
@@ -50,7 +50,7 @@ public class DatabaseImpl implements TransactionalDatabase {
     }
 
     @Override
-    public DatabaseImpl commit() {
+    public DatabaseImpl<T> commit() {
         if (isOpen()) {
             Snapshot transaction;
             while (Objects.nonNull(transaction = this.snapshots.poll())) {
@@ -71,26 +71,26 @@ public class DatabaseImpl implements TransactionalDatabase {
     }
 
     @Override
-    public DatabaseImpl set(String key, String value) {
+    public DatabaseImpl<T> set(String key, T value) {
         this.currentSnapshot.set(key, value);
 
         return this;
     }
 
     @Override
-    public String get(String key) {
+    public T get(String key) {
         return this.currentSnapshot.get(key);
     }
 
     @Override
-    public DatabaseImpl delete(String key) {
+    public DatabaseImpl<T> delete(String key) {
         this.currentSnapshot.delete(key);
 
         return this;
     }
 
     @Override
-    public long count(String value) {
+    public long count(T value) {
         long count = this.snapshot.count(value);
         count += this.snapshots.stream()
                 .mapToLong(s -> s.count(value))
@@ -100,7 +100,7 @@ public class DatabaseImpl implements TransactionalDatabase {
         return count;
     }
 
-    private Snapshot createSnapshot() {
+    private Snapshot<T> createSnapshot() {
         return this.snapshotSupplier.get();
     }
 
