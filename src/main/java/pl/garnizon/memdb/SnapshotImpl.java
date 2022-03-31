@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 
 public class SnapshotImpl<T> implements Snapshot<T> {
 
-    public static final Object TOMBSTONE = "NULL";
+    public static final Entity TOMBSTONE = new EntityImpl(null);
 
-    public static <T> T getTombstone() {
+    public T getTombstone() {
         return (T) TOMBSTONE;
     }
 
@@ -68,7 +68,7 @@ public class SnapshotImpl<T> implements Snapshot<T> {
     public long count(T value) {
         final Collection<String> keys = invertedIndex.get(value);
         long count = keys.stream()
-                .mapToInt(key -> memtable.get(key).equals(TOMBSTONE) ? -1 : 1)
+                .mapToInt(key -> memtable.get(key).equals(getTombstone()) ? -1 : 1)
                 .sum();
 
         final Collection<String> tombstones = invertedIndex.get(getTombstone());

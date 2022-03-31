@@ -1,9 +1,9 @@
 package pl.garnizon.memdb;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -15,12 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DatabaseImplTest {
+
+    public static final String TOMBSTONE = "NULL";
 
     @Mock
     Snapshot snapshot;
@@ -30,10 +33,6 @@ class DatabaseImplTest {
 
     @Spy
     Deque<Snapshot<String>> snapshots = new LinkedList<>();
-
-    @BeforeAll
-    static public void beforeAll() {
-    }
 
     @Test
     public void baseSnapshotCreationTest() {
@@ -94,7 +93,7 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterCommit() {
-        final DatabaseImpl<String> database = DatabaseImpl.create();
+        final DatabaseImpl<String> database = new DatabaseImpl(this::getSnapshotWithMockedTombstone, new LinkedList<>());
 
         final String name = "name";
         final String name2 = "name2";
@@ -122,7 +121,7 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterRollback() {
-        final DatabaseImpl<String> database = DatabaseImpl.create();
+        final DatabaseImpl<String> database = new DatabaseImpl(this::getSnapshotWithMockedTombstone, new LinkedList<>());
 
         final String name = "name";
         final String name2 = "name2";
@@ -143,7 +142,13 @@ class DatabaseImplTest {
 
         assertThat(database.commit().count(value)).isEqualTo(1);
         assertThat(database.get(name)).isEqualTo(value);
-        assertThat(database.get(name2)).isEqualTo(SnapshotImpl.TOMBSTONE);
+        assertThat(database.get(name2)).isEqualTo(TOMBSTONE);
+    }
+
+    private Snapshot<String> getSnapshotWithMockedTombstone() {
+        final SnapshotImpl snapshotMock = Mockito.spy(SnapshotImpl.create());
+        lenient().when(snapshotMock.getTombstone()).thenReturn(TOMBSTONE);
+        return snapshotMock;
     }
 
 }
