@@ -3,34 +3,34 @@ package pl.garnizon.memdb;
 public class Main {
 
     public static void main(String[] args) {
-        TransactionalDatabase<String> transactionalDatabase = DatabaseImpl.create();
-        transactionalDatabase.set("name", "michal");
-        transactionalDatabase.get("name");
-        transactionalDatabase.delete("name");
-        transactionalDatabase.get("name");
-        transactionalDatabase.set("name", "michal");
-        transactionalDatabase.set("name2", "michal");
-        transactionalDatabase.count("michal");
-        transactionalDatabase.begin();
-        transactionalDatabase.set("name", "jan");
-        transactionalDatabase.begin();
-        transactionalDatabase.set("name2", "janek");
-        transactionalDatabase.set("name3", "michal");
-        transactionalDatabase.rollback();
-        transactionalDatabase.set("name4", "michal");
-        transactionalDatabase.commit();
-        transactionalDatabase.begin();
-        transactionalDatabase.delete("name4");
-        transactionalDatabase.begin();
-        transactionalDatabase.delete("name2");
-        transactionalDatabase.commit();
-        transactionalDatabase.commit();
-        transactionalDatabase.get("name");
-        transactionalDatabase.get("name2");
+        TransactionalDatabase<String> database = DatabaseSystem.create(); //DatabaseImpl.create();
+        database.set("name", "michal");
+        database.get("name");
+        database.delete("name");
+        database.get("name");
+        database.set("name", "michal");
+        database.set("name2", "michal");
+        database.count("michal");
+        database.begin();
+        database.set("name", "jan");
+        database.begin();
+        database.set("name2", "janek");
+        database.set("name3", "michal");
+        database.rollback();
+        database.set("name4", "michal");
+        database.commit();
+        database.begin();
+        database.delete("name4");
+        database.begin();
+        database.delete("name2");
+        database.commit();
+        database.commit();
+        database.get("name");
+        database.get("name2");
 
-        transactionalDatabase.count("michal");
-        transactionalDatabase.commit();
-        transactionalDatabase.rollback();
+        database.count("michal");
+        database.commit();
+        database.rollback();
     }
 
 }
