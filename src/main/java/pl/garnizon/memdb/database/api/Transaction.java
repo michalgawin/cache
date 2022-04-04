@@ -1,4 +1,4 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database.api;
 
 public interface Transaction {
 

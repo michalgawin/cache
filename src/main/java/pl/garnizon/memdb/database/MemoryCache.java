@@ -1,14 +1,20 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database;
 
-public class DatabaseSystem<T extends Comparable<T>> implements TransactionalDatabase<T> {
+import pl.garnizon.memdb.database.api.Transaction;
+import pl.garnizon.memdb.database.api.TransactionalDatabase;
+import pl.garnizon.memdb.database.entity.api.Entity;
+import pl.garnizon.memdb.database.entity.impl.EntityImpl;
+import pl.garnizon.memdb.database.impl.DatabaseImpl;
+
+public class MemoryCache<T extends Comparable<T>> implements TransactionalDatabase<T> {
 
     TransactionalDatabase<Entity<T>> database;
 
-    public static <T extends Comparable<T>> DatabaseSystem<T> create() {
-        return new DatabaseSystem<>(DatabaseImpl.create());
+    public static <T extends Comparable<T>> MemoryCache<T> create() {
+        return new MemoryCache<>(DatabaseImpl.create());
     }
 
-    DatabaseSystem(TransactionalDatabase<Entity<T>> database) {
+    MemoryCache(TransactionalDatabase<Entity<T>> database) {
         this.database = database;
     }
 
