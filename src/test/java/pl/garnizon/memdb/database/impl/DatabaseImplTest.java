@@ -1,29 +1,33 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database.impl;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.garnizon.memdb.database.api.Database;
+import pl.garnizon.memdb.database.api.Transaction;
+import pl.garnizon.memdb.database.snapshot.api.AbstractSnapshot;
+import pl.garnizon.memdb.database.snapshot.api.Snapshot;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DatabaseImplTest {
-
-    public static final String TOMBSTONE = "NULL";
 
     @Mock
     Snapshot snapshot;
@@ -93,7 +97,7 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterCommit() {
-        final DatabaseImpl<String> database = new DatabaseImpl(this::getSnapshotWithMockedTombstone, new LinkedList<>());
+        final DatabaseImpl<String> database = new DatabaseImpl(SnapshotImplTest::create, new LinkedList<>());
 
         final String name = "name";
         final String name2 = "name2";
@@ -121,7 +125,7 @@ class DatabaseImplTest {
 
     @Test
     public void countKeysWithValueTestAfterRollback() {
-        final DatabaseImpl<String> database = new DatabaseImpl(this::getSnapshotWithMockedTombstone, new LinkedList<>());
+        final DatabaseImpl<String> database = new DatabaseImpl(SnapshotImplTest::create, new LinkedList<>());
 
         final String name = "name";
         final String name2 = "name2";
@@ -142,13 +146,25 @@ class DatabaseImplTest {
 
         assertThat(database.commit().count(value)).isEqualTo(1);
         assertThat(database.get(name)).isEqualTo(value);
-        assertThat(database.get(name2)).isEqualTo(TOMBSTONE);
+        assertThat(database.get(name2)).isEqualTo(SnapshotImplTest.TOMBSTONE);
     }
 
-    private Snapshot<String> getSnapshotWithMockedTombstone() {
-        final SnapshotImpl snapshotMock = Mockito.spy(SnapshotImpl.create());
-        lenient().when(snapshotMock.getTombstone()).thenReturn(TOMBSTONE);
-        return snapshotMock;
+    private static class SnapshotImplTest extends AbstractSnapshot<String> {
+
+        public static final String TOMBSTONE = "NULL";
+
+        public static SnapshotImplTest create() {
+            return new SnapshotImplTest(new HashMap<>(), TreeMultimap.create());
+        }
+
+        public SnapshotImplTest(Map<String, String> memtable, Multimap<String, String> invertedIndex) {
+            super(memtable, invertedIndex);
+        }
+
+        @Override
+        public String getTombstone() {
+            return TOMBSTONE;
+        }
     }
 
 }

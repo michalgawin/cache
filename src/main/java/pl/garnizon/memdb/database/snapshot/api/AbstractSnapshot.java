@@ -1,40 +1,30 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database.snapshot.api;
 
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class SnapshotImpl<T> implements Snapshot<T> {
+public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 
-    public static final Entity TOMBSTONE = new EntityImpl(null);
-
-    public T getTombstone() {
-        return (T) TOMBSTONE;
-    }
+    public abstract T getTombstone();
 
     private final Map<String, T> memtable;
     private final Multimap<T, String> invertedIndex;
 
-    public static SnapshotImpl create() {
-        return new SnapshotImpl(new HashMap<>(), TreeMultimap.create());
-    }
-
-    SnapshotImpl(Map<String, T> memtable, Multimap<T, String> invertedIndex) {
+    public AbstractSnapshot(Map<String, T> memtable, Multimap<T, String> invertedIndex) {
         this.memtable = memtable;
         this.invertedIndex = invertedIndex;
     }
 
     @Override
-    public SnapshotImpl set(String key, T value) {
+    public AbstractSnapshot set(String key, T value) {
         return updateRevertedIndex(key, memtable.put(key, value), value);
     }
 
-    private SnapshotImpl updateRevertedIndex(String key, T oldValue, T value) {
+    private AbstractSnapshot updateRevertedIndex(String key, T oldValue, T value) {
         if (Objects.nonNull(oldValue)) {
             deleteFromInvertedIndex(key, oldValue, value);
         }
@@ -51,11 +41,11 @@ public class SnapshotImpl<T> implements Snapshot<T> {
     }
 
     @Override
-    public SnapshotImpl delete(String key) {
+    public AbstractSnapshot delete(String key) {
         return deleteFromInvertedIndex(key, memtable.put(key, getTombstone()), getTombstone());
     }
 
-    private SnapshotImpl deleteFromInvertedIndex(String key, T oldValue, T value) {
+    private AbstractSnapshot deleteFromInvertedIndex(String key, T oldValue, T value) {
         if (Objects.nonNull(oldValue)) {
             invertedIndex.get(oldValue).removeIf(k -> k.equals(key));
         }

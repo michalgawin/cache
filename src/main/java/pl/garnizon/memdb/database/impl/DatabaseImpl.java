@@ -1,4 +1,8 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database.impl;
+
+import pl.garnizon.memdb.database.api.TransactionalDatabase;
+import pl.garnizon.memdb.database.snapshot.api.Snapshot;
+import pl.garnizon.memdb.database.snapshot.impl.SnapshotImpl;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -15,8 +19,8 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
     private final Deque<Snapshot<T>> snapshots;
     private Snapshot<T> currentSnapshot;
 
-    public static DatabaseImpl create() {
-        return new DatabaseImpl(SnapshotImpl::create, new LinkedList<>());
+    public static <T extends Comparable<T>> DatabaseImpl<T> create() {
+        return new DatabaseImpl<>(SnapshotImpl::create, new LinkedList<>());
     }
 
     DatabaseImpl(Supplier<Snapshot<T>> snapshotSupplier, Deque<Snapshot<T>> snapshots) {

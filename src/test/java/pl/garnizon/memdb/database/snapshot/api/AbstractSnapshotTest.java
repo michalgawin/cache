@@ -1,4 +1,4 @@
-package pl.garnizon.memdb;
+package pl.garnizon.memdb.database.snapshot.api;
 
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;
@@ -14,14 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SnapshotImplTest {
-
-    public static final String TOMBSTONE = "NULL";
+class AbstractSnapshotTest {
 
     @Mock
     Map<String, String> memtable;
@@ -30,7 +27,7 @@ class SnapshotImplTest {
     Multimap<String, String> invertedIndex;
 
     @InjectMocks
-    SnapshotImpl<String> snapshot;
+    SnapshotImplTest snapshot;
 
     @Test
     public void setTest() {
@@ -57,13 +54,11 @@ class SnapshotImplTest {
 
     @Test
     public void countTest() {
-        Snapshot<String> snapshot = getSnapshotWithMockedTombstone();
-
         when(memtable.get("a")).thenReturn("c");
         when(memtable.get("b")).thenReturn("c");
         when(invertedIndex.get("c")).thenReturn(Set.of("a", "b"));
         when(invertedIndex.get("a")).thenReturn(Set.of());
-        when(invertedIndex.get(TOMBSTONE)).thenReturn(Set.of());
+        when(invertedIndex.get(SnapshotImplTest.TOMBSTONE)).thenReturn(Set.of());
 
         assertThat(snapshot.count("c")).isEqualTo(2);
         assertThat(snapshot.count("a")).isEqualTo(0);
@@ -79,10 +74,18 @@ class SnapshotImplTest {
         verify(memtable).put(anyString(), anyString());
     }
 
-    private Snapshot<String> getSnapshotWithMockedTombstone() {
-        final SnapshotImpl snapshotMock = spy(snapshot);
-        when(snapshotMock.getTombstone()).thenReturn(TOMBSTONE);
-        return snapshotMock;
+    private static class SnapshotImplTest extends AbstractSnapshot<String> {
+
+        public static final String TOMBSTONE = "NULL";
+
+        public SnapshotImplTest(Map<String, String> memtable, Multimap<String, String> invertedIndex) {
+            super(memtable, invertedIndex);
+        }
+
+        @Override
+        public String getTombstone() {
+            return TOMBSTONE;
+        }
     }
 
 }
