@@ -1,6 +1,6 @@
-package pl.garnizon.memdb.database.snapshot.api;
+package pl.garnizon.cache.snapshot.api;
 
-import pl.garnizon.memdb.database.api.Database;
+import pl.garnizon.cache.api.Database;
 
 import java.util.Map;
 

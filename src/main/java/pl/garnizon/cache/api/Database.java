@@ -1,4 +1,4 @@
-package pl.garnizon.memdb.database.api;
+package pl.garnizon.cache.api;
 
 public interface Database<T> {
 

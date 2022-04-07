@@ -1,4 +1,4 @@
-package pl.garnizon.memdb;
+package pl.garnizon.cache;
 
 public class Main {
 

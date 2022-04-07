@@ -1,10 +1,10 @@
-package pl.garnizon.memdb.database.snapshot.impl;
+package pl.garnizon.cache.snapshot.impl;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
-import pl.garnizon.memdb.database.entity.api.Entity;
-import pl.garnizon.memdb.database.entity.impl.EntityImpl;
-import pl.garnizon.memdb.database.snapshot.api.AbstractSnapshot;
+import pl.garnizon.cache.entity.api.Entity;
+import pl.garnizon.cache.entity.impl.EntityImpl;
+import pl.garnizon.cache.snapshot.api.AbstractSnapshot;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;

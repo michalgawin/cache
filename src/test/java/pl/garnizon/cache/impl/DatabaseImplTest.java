@@ -1,4 +1,4 @@
-package pl.garnizon.memdb.database.impl;
+package pl.garnizon.cache.impl;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -7,10 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.garnizon.memdb.database.api.Database;
-import pl.garnizon.memdb.database.api.Transaction;
-import pl.garnizon.memdb.database.snapshot.api.AbstractSnapshot;
-import pl.garnizon.memdb.database.snapshot.api.Snapshot;
+import pl.garnizon.cache.api.Database;
+import pl.garnizon.cache.api.Transaction;
+import pl.garnizon.cache.snapshot.api.AbstractSnapshot;
+import pl.garnizon.cache.snapshot.api.Snapshot;
 
 import java.util.Deque;
 import java.util.HashMap;
