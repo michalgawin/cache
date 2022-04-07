@@ -1,6 +1,6 @@
-package pl.garnizon.memdb.database.entity.impl;
+package pl.garnizon.cache.entity.impl;
 
-import pl.garnizon.memdb.database.entity.api.Entity;
+import pl.garnizon.cache.entity.api.Entity;
 
 import java.util.Comparator;
 import java.util.Objects;

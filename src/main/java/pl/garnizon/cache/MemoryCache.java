@@ -1,10 +1,10 @@
-package pl.garnizon.memdb.database;
+package pl.garnizon.cache;
 
-import pl.garnizon.memdb.database.api.Transaction;
-import pl.garnizon.memdb.database.api.TransactionalDatabase;
-import pl.garnizon.memdb.database.entity.api.Entity;
-import pl.garnizon.memdb.database.entity.impl.EntityImpl;
-import pl.garnizon.memdb.database.impl.DatabaseImpl;
+import pl.garnizon.cache.api.Transaction;
+import pl.garnizon.cache.api.TransactionalDatabase;
+import pl.garnizon.cache.entity.api.Entity;
+import pl.garnizon.cache.entity.impl.EntityImpl;
+import pl.garnizon.cache.impl.DatabaseImpl;
 
 public class MemoryCache<T extends Comparable<T>> implements TransactionalDatabase<T> {
 

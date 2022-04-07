@@ -1,4 +1,4 @@
-package pl.garnizon.memdb.database.snapshot.api;
+package pl.garnizon.cache.snapshot.api;
 
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;

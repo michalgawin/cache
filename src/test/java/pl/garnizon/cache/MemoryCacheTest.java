@@ -1,8 +1,8 @@
-package pl.garnizon.memdb.database;
+package pl.garnizon.cache;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import pl.garnizon.memdb.database.api.TransactionalDatabase;
+import pl.garnizon.cache.api.TransactionalDatabase;
 
 class MemoryCacheTest {
 

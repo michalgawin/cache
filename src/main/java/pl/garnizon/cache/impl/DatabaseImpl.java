@@ -1,8 +1,8 @@
-package pl.garnizon.memdb.database.impl;
+package pl.garnizon.cache.impl;
 
-import pl.garnizon.memdb.database.api.TransactionalDatabase;
-import pl.garnizon.memdb.database.snapshot.api.Snapshot;
-import pl.garnizon.memdb.database.snapshot.impl.SnapshotImpl;
+import pl.garnizon.cache.api.TransactionalDatabase;
+import pl.garnizon.cache.snapshot.api.Snapshot;
+import pl.garnizon.cache.snapshot.impl.SnapshotImpl;
 
 import java.util.Deque;
 import java.util.LinkedList;
