@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 
 public abstract class AbstractSnapshot<T> implements Snapshot<T> {
 
-    public abstract T getTombstone();
-
     private final Map<String, T> memtable;
     private final Multimap<T, String> invertedIndex;
 

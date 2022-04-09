@@ -42,4 +42,13 @@ class MemoryCacheTest {
         Assertions.assertThat(database.count("ghi")).isEqualTo(1);
     }
 
+    @Test
+    public void getFromBaseSnapshot() {
+        TransactionalDatabase<String> database = MemoryCache.create();
+        database.set("name", "abc");
+        database.begin();
+
+        Assertions.assertThat(database.get("name")).isEqualTo("abc");
+    }
+
 }
