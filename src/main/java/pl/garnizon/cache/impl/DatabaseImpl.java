@@ -15,7 +15,7 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
     public static final String NO_TRANSACTION = "NO TRANSACTION";
 
     private final Supplier<Snapshot<T>> snapshotSupplier;
-    private final Snapshot<T> snapshot;
+    private final Snapshot<T> base;
     private final Deque<Snapshot<T>> snapshots;
     private Snapshot<T> currentSnapshot;
 
@@ -27,8 +27,8 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
         this.snapshotSupplier = snapshotSupplier;
         this.snapshots = snapshots;
 
-        this.snapshot = createSnapshot();
-        this.currentSnapshot = this.snapshot;
+        this.base = createSnapshot();
+        this.currentSnapshot = this.base;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
             this.snapshots.pollLast();
             this.currentSnapshot = this.snapshots.peekLast();
             if (this.currentSnapshot == null) {
-                this.currentSnapshot = this.snapshot;
+                this.currentSnapshot = this.base;
             }
         }
 
@@ -58,9 +58,9 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
         if (isOpen()) {
             Snapshot transaction;
             while (Objects.nonNull(transaction = this.snapshots.poll())) {
-                this.snapshot.merge(transaction);
+                this.base.merge(transaction);
             }
-            this.currentSnapshot = snapshot;
+            this.currentSnapshot = base;
         }
 
         return this;
@@ -83,7 +83,8 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
 
     @Override
     public T get(String key) {
-        return this.currentSnapshot.get(key);
+        T t = this.currentSnapshot.get(key);
+        return currentSnapshot.isTombstone(t) ? this.base.get(key) : t;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class DatabaseImpl<T> implements TransactionalDatabase<T> {
 
     @Override
     public long count(T value) {
-        long count = this.snapshot.count(value);
+        long count = this.base.count(value);
         count += this.snapshots.stream()
                 .mapToLong(s -> s.count(value))
                 .sum();
